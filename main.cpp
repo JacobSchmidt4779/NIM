@@ -3,6 +3,7 @@
 #include <ctime>
 #include <vector>
 #include <unistd.h>
+#include <limits>
 #include <algorithm>
 
 using namespace std;
@@ -70,12 +71,20 @@ class NimGame{
 
 
     void generateLists(){
-        while (!move){
+        bool valid = false;
+        while (!valid) {
             cout << "\nHow many piles would you like? (2-5): ";
-            cin >> pileAmount;
-            move = (pileAmount >= 2 && pileAmount <= 5);
-            if (!move){
-                cout << "\nInvalid input, please try again.";
+            
+            if (cin >> pileAmount) {
+                if (pileAmount >= 2 && pileAmount <= 5) {
+                    valid = true;
+                } else {
+                    cout << "Please enter a number between 2 and 5.\n";
+                }
+            } else {
+                cout << "Invalid input: Please enter a number.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
         }
         srand(time(0));
@@ -126,10 +135,14 @@ class NimGame{
                 cout << "\n How many objects would you like to remove 1-3? ";
                 cin >> remove;
                 if (remove > 0 && remove < 4 && stackSelect < stacks.size()  && stackSelect >= 0){
-                    stacks[stackSelect] -= remove;
-                    turn = false;
-                    move = true;
-                    displayGame();
+                    if (stacks[stackSelect] - remove >= 0){
+                        stacks[stackSelect] -= remove;
+                        turn = false;
+                        move = true;
+                        displayGame();
+                    }else{
+                        cout << "Invalid move, try again" << endl;
+                    }
                 }else{
                     cout << "Invalid move, try again" << endl;
                 }
